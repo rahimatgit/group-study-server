@@ -9,8 +9,8 @@ const port = process.env.PORT || 5000;
 
 // middleware
 app.use(cors({
-    origin: ['http://localhost:5173'],
-    credentials: true
+  origin: ['http://localhost:5173'],
+  credentials: true
 }));
 
 app.use(express.json());
@@ -39,10 +39,17 @@ async function run() {
 
 
     // all assignment
-    app.get('/assignments', async(req, res) => {
-        const cursor = assignmentCollection.find();
-            const result = await cursor.toArray();
-            res.send(result); 
+    app.get('/assignments', async (req, res) => {
+      const page = parseInt(req.query.page);
+      const size = parseInt(req.query.size);
+      const cursor = assignmentCollection.find().skip(page * size).limit(size);
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+
+    app.get('/assignmentCount', async (req, res) => {
+      const count = await assignmentCollection.estimatedDocumentCount();
+      res.send({ count });
     })
 
     // Send a ping to confirm a successful connection
@@ -58,9 +65,9 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('assignMate is running')
+  res.send('assignMate is running')
 })
 
 app.listen(port, () => {
-    console.log(`AssignMate Server is running on port ${port}`)
+  console.log(`AssignMate Server is running on port ${port}`)
 })
