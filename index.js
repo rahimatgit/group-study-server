@@ -2,14 +2,14 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const app = express();
 const port = process.env.PORT || 5000;
 
 // middleware
 app.use(cors({
-  origin: ['http://localhost:5173'],
+  origin: ['http://localhost:5173', 'https://assignment-11-group-study-server.vercel.app'],
   credentials: true
 }));
 
@@ -33,7 +33,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const assignmentCollection = client.db('groupStudy').collection('assignments');
 
@@ -52,9 +52,36 @@ async function run() {
       res.send({ count });
     })
 
-    app.post('/assignments', async(req, res) => {
+    app.get('/assignments/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await assignmentCollection.findOne(query);
+      res.send(result);
+    })
+
+    app.post('/assignments', async (req, res) => {
       const newAssignment = req.body;
       const result = await assignmentCollection.insertOne(newAssignment);
+      res.send(result);
+    })
+
+    app.put("/assignments/:id", async (req, res) => {
+      const id = req.params;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedAssignment = req.body;
+      const assignment = {
+        $set: {
+          title: updatedAssignment.title,
+          email: updatedAssignment.email,
+          image: updatedAssignment.image,
+          marks: updatedAssignment.marks,
+          difficulty_level: updatedAssignment.difficulty_level,
+          description: updatedAssignment.description,
+          due_date: updatedAssignment.due_date
+        }
+      }
+      const result = await assignmentCollection.updateOne(filter, assignment, options);
       res.send(result);
     })
 
