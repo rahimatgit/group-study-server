@@ -7,7 +7,7 @@ require('dotenv').config()
 const app = express();
 const port = process.env.PORT || 5000;
 
-// middleware
+
 // app.use(cors({
 //   origin: ['http://localhost:5173', 'https://assignment-11-group-study-server.vercel.app', 'https://assignment-11-group-study.web.app/'],
 //   credentials: true
@@ -16,8 +16,6 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
-
-
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.bgmtqy5.mongodb.net/?retryWrites=true&w=majority`;
