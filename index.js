@@ -36,6 +36,8 @@ async function run() {
     // await client.connect();
 
     const assignmentCollection = client.db('groupStudy').collection('assignments');
+    const submittedCollection = client.db('groupStudy').collection('submitted');
+    const myAssignmentCollection = client.db('groupStudy').collection('myAssignment');
 
 
     // all assignment
@@ -64,6 +66,13 @@ async function run() {
       const result = await assignmentCollection.insertOne(newAssignment);
       res.send(result);
     })
+
+    app.post('/submitted', async(req, res) => {
+      const submitted = req.body;
+      const result = await submittedCollection.insertOne(submitted);
+      res.send(result);
+    })
+
 
     app.put("/assignments/:id", async (req, res) => {
       const id = req.params;
